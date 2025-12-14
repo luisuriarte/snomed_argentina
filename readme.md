@@ -50,7 +50,7 @@ LOAD DATA LOCAL INFILE 'der2_Refset_SimpleFull_ArgentinaEdition_AAAAMMDD.txt' IN
 ```
 En caso que no se cargen los datos en la tabla sct2_descriptions desde el script modificado, se debe hacer manualmente desde la consola ingresando a mysql:
 ```mysql
-LOAD DATA LOCAL INFILE './sct2_Description_Full_ArgentinaEdition_20250820.txt' INTO TABLE sct2_description FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE './sct2_Description_Full_ArgentinaEdition_AAAAMMDD.txt' INTO TABLE sct2_description FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 ```
 Tabla donde esta cargadas las versiones de SNOMED: standardized_tables_track
 
