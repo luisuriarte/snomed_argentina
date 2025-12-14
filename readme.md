@@ -46,7 +46,7 @@ Luego hay que tomar el archivo der2_Refset_SimpleFull_ArgentinaEdition_AAAAMMDD.
 que esta en la carpeta Full/Refset/Content/
 Cargar ese archivo en la tabla sct2_refset con el script (en consola mysql):
 ```mysql
-LOAD DATA LOCAL INFILE 'der2_Refset_SimpleFull_ArgentinaEdition_AAAAMMDD.txt' INTO TABLE sct2_refset FIELDS TERMINATED BY '\\t' ESCAPED BY '' LINES TERMINATED BY '\\n' IGNORE 1 LINES;
+LOAD DATA LOCAL INFILE 'der2_Refset_SimpleFull_ArgentinaEdition_AAAAMMDD.txt' INTO TABLE sct2_refset FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 ```
 En caso que no se cargen los datos en la tabla sct2_descriptions desde el script modificado, se debe hacer manualmente desde la consola ingresando a mysql:
 ```mysql
