@@ -469,7 +469,7 @@ function snomedRF2_import()
                                 $new_str = str_replace($array_replace, array($file_replace, "sct2_relationship"), $load_script);
                             }
                             if (strpos($filename1, "sRefset") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace, "sct2_refset"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_refset_simplefull"), $load_script);
                             }
                             if (strpos($filename1, "StatedRelationship") !== false) {
                                 $new_str = str_replace($array_replace, array($file_replace, "sct2_statedrelationship"), $load_script);
