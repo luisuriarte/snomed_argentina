@@ -45,11 +45,11 @@ CREATE TABLE IF NOT EXISTS `sct2_refset` (
 Luego hay que tomar el archivo der2_Refset_SimpleFull_ArgentinaEdition_AAAAMMDD.txt
 que esta en la carpeta Full/Refset/Content/
 Cargar ese archivo en la tabla sct2_refset con el script:
-```
+```mysql
 MariaDB [(none)]> LOAD DATA LOCAL INFILE 'der2_Refset_SimpleFull_ArgentinaEdition_AAAAMMDD.txt' INTO TABLE sct2_refset FIELDS TERMINATED BY '\\t' ESCAPED BY '' LINES TERMINATED BY '\\n' IGNORE 1 LINES;
 ```
 En caso que no se cargen los datos en la tabla sct2_descriptions desde el script modificado, se debe hacer manualmente desde la consola ingresando a mysql:
-```
+```mysql
 MariaDB [(none)]> LOAD DATA LOCAL INFILE './sct2_Description_Full_ArgentinaEdition_20250820.txt' INTO TABLE sct2_description FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 ```
 Tabla donde esta cargadas las versiones de SNOMED: standardized_tables_track
