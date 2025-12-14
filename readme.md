@@ -175,4 +175,26 @@ INSERT INTO codes
 		AND d.term NOT LIKE '%(producto medicinal)'
 		GROUP BY code_text;		
 ```	
-		
+Incluir Prestaciones (Practicas) de una clínica en los códigos.
+Primero en Tipos de Códigos se debe agregar uno (Por ejemplo Prestaciones) con un codigo (Seq.) 120 y se debe marcar tarifas y procedimientos.
+Para asegurarno uno nuevo primero borrar códigos viejos:
+```sql
+DELETE FROM codes WHERE code_type = '120';
+```
+Luego:
+```sql
+INSERT INTO codes
+	SELECT 0 AS id, d.term AS code_text, d.term AS code_text_short, ROW_NUMBER() OVER(ORDER BY id) AS code, '120' AS code_type,
+		'' AS modifier, 0 AS units, NULL AS fee, 0.0 AS superbill, '' AS related_code, '' AS taxrates, 0 AS cyp_factor,
+		1 AS active, 0 AS reportable, 0 AS financial_reporting, '' AS revenue_code 
+	FROM sct2_description AS d
+		INNER JOIN sct2_refset AS r
+		ON r.referencedComponentId = d.conceptId
+	WHERE r.refsetId = '577281000221100' 
+		AND r.active = '1'
+		AND d.`active` = '1'
+		AND d.effectiveTime > '2003-10-31'
+		AND d.term NOT LIKE '%(procedimiento)'
+		GROUP BY code_text;		
+```	
+
