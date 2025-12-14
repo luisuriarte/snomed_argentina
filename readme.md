@@ -18,7 +18,7 @@ Editar código (estos ya estan agregados a los scripts):
 
 Borrar codigos en ingles de la version Argentina de Snomed:
 ```sql
-DELETE FROM sct2_description WHERE languageCode='en'; (10 min aprox.)
+DELETE FROM sct2_description WHERE languageCode='en';
 DELETE FROM sct2_textdefinition WHERE languageCode='en';
 ```
 Verificar:
