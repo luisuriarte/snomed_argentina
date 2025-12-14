@@ -2,7 +2,7 @@ Consideraciones:
 
 Editar código (estos ya estan agregados a los scripts):
 /openemr/interface/code_systems/list_staged.php Linea 226, agregar:
-```
+```php
                 } elseif (preg_match("/SnomedCT_Argentina-EditionRelease_PRODUCTION_([0-9]{8})[0-9a-zA-Z]{8}.zip/", $file, $matches)) {
                     // Hard code the version SNOMED feed to be International:Spanish
                     // Contains the Snapshot, Delta and Full folders with the Argentina extension files already unified
@@ -72,7 +72,7 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.term NOT LIKE '%(presentación farmacéutica comercial)'
 		AND d.term NOT LIKE '%(fármaco de uso clínico comercial)'
 		GROUP BY d.term;
-```sql		
+```		
 Ejemplo conjunto de referencias simples de Diagnósticos
 de odontología de Argentina
 ```sql
@@ -86,7 +86,7 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.term NOT LIKE '%(hallazgo)'
 		AND d.term NOT LIKE '%(trastorno)'
 		GROUP BY d.term;
-```sql
+```
 
 Ejemplo conjunto de referencias simples de Procedimientos
 de odontología de Argentina
@@ -104,7 +104,7 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.term NOT LIKE '%(objeto físico)'
 		AND d.term NOT LIKE '%(régimen/tratamiento)'
 		GROUP BY d.term;
-```sql
+```
 
 conjunto de referencias simples de prácticas de laboratorio de Argentina:
 ```sql
@@ -117,7 +117,7 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.effectiveTime > '2003-10-31'
 		AND d.term NOT LIKE '%(procedimiento)'
 		GROUP BY d.term;
-```sql
+```
 
 Conjunto de referencias de prácticas prescribibles de diagnóstico por imágenes Argentina:
 ```sql
@@ -130,7 +130,7 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.effectiveTime > '2003-10-31'
 		AND d.term NOT LIKE '%(procedimiento)'
 		GROUP BY d.term;	
-```sql		
+```		
 Para buscar medicamentos en recetas, estos estan en la tabla code. Para insertar los medicamentos de ANMAT en codes es:
 Primero:
 ```sql
@@ -152,7 +152,7 @@ INSERT INTO codes
 		AND d.term NOT LIKE '%presentación farmacéutica comercial%'
 		AND d.term NOT LIKE '%fármaco de uso clínico comercial%'
 		GROUP BY code_text;
-```sql		
+```		
 Agregar Vacunas de Argentina. Primero borrar otras vacunas (tabla codes)
 Primero:
 ```sql
@@ -174,5 +174,5 @@ INSERT INTO codes
 		AND d.term NOT LIKE '%(fármaco de uso clínico%'
 		AND d.term NOT LIKE '%(producto medicinal)'
 		GROUP BY code_text;		
-```sql	
+```	
 		
