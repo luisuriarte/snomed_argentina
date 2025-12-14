@@ -17,17 +17,17 @@ Editar código (estos ya estan agregados a los scripts):
 ```
 
 Borrar codigos en ingles de la version Argentina de Snomed:
-```
+```sql
 DELETE FROM sct2_description WHERE languageCode='en'; (10 min aprox.)
 DELETE FROM sct2_textdefinition WHERE languageCode='en';
 ```
 Verificar:
-```
+```sql
 SELECT * FROM sct2_description WHERE languageCode <> 'en'
 ```
 Para Ver los códigos agregados en Argentina (PDF, ReleaseNotes)
 es necesario crear una tabla auxiliar (sct2_refset) con este script:
-```
+```sql
 CREATE TABLE IF NOT EXISTS `sct2_refset` (
             `id` varchar(80) NOT NULL,
             `effectiveTime` date NOT NULL,
@@ -61,7 +61,7 @@ campo refSetId de la tabla sct2_refset.
 Por ejemplo refset 331101000221109 = conjunto de referencias simples de
 presentaciones farmacéuticas comerciales del Vademecum Nacional de
 Medicamentos en estado comercializado (metadato fundacional)
-```
+```sql
 SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 	INNER JOIN sct2_refset AS r
 		ON r.referencedComponentId = d.conceptId
@@ -72,10 +72,10 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.term NOT LIKE '%(presentación farmacéutica comercial)'
 		AND d.term NOT LIKE '%(fármaco de uso clínico comercial)'
 		GROUP BY d.term;
-```		
+```sql		
 Ejemplo conjunto de referencias simples de Diagnósticos
 de odontología de Argentina
-```
+```sql
 SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 	INNER JOIN sct2_refset AS r
 		ON r.referencedComponentId = d.conceptId
@@ -86,11 +86,11 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.term NOT LIKE '%(hallazgo)'
 		AND d.term NOT LIKE '%(trastorno)'
 		GROUP BY d.term;
-```
+```sql
 
 Ejemplo conjunto de referencias simples de Procedimientos
 de odontología de Argentina
-```
+```sql
 SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 	INNER JOIN sct2_refset AS r
 		ON r.referencedComponentId = d.conceptId
@@ -104,10 +104,10 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.term NOT LIKE '%(objeto físico)'
 		AND d.term NOT LIKE '%(régimen/tratamiento)'
 		GROUP BY d.term;
-```
+```sql
 
 conjunto de referencias simples de prácticas de laboratorio de Argentina:
-```
+```sql
 SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 	INNER JOIN sct2_refset AS r
 		ON r.referencedComponentId = d.conceptId
@@ -117,10 +117,10 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.effectiveTime > '2003-10-31'
 		AND d.term NOT LIKE '%(procedimiento)'
 		GROUP BY d.term;
-```
+```sql
 
-conjunto de referencias de prácticas prescribibles de diagnóstico por imágenes Argentina:
-```
+Conjunto de referencias de prácticas prescribibles de diagnóstico por imágenes Argentina:
+```sql
 SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 	INNER JOIN sct2_refset AS r
 		ON r.referencedComponentId = d.conceptId
@@ -130,14 +130,14 @@ SELECT d.id, d.effectiveTime, r.active, d.term FROM sct2_description AS d
 		AND d.effectiveTime > '2003-10-31'
 		AND d.term NOT LIKE '%(procedimiento)'
 		GROUP BY d.term;	
-```		
+```sql		
 Para buscar medicamentos en recetas, estos estan en la tabla code. Para insertar los medicamentos de ANMAT en codes es:
 Primero:
-```
+```sql
 DELETE FROM codes WHERE code_type = '109';
 ```
 Luego:
-```
+```sql
 INSERT INTO codes
 	SELECT 0 AS id, d.term AS code_text, '' AS code_text_short, ROW_NUMBER() OVER(ORDER BY id) AS code, '109' AS code_type,
 		'' AS modifier, 0 AS units, NULL AS fee, 0.0 AS superbill, '' AS related_code, '' AS taxrates, 0 AS cyp_factor,
@@ -152,14 +152,14 @@ INSERT INTO codes
 		AND d.term NOT LIKE '%presentación farmacéutica comercial%'
 		AND d.term NOT LIKE '%fármaco de uso clínico comercial%'
 		GROUP BY code_text;
-```		
+```sql		
 Agregar Vacunas de Argentina. Primero borrar otras vacunas (tabla codes)
 Primero:
-```
+```sql
 DELETE FROM codes WHERE code_type = '100';
 ```
 Luego:
-```
+```sql
 INSERT INTO codes
 	SELECT 0 AS id, d.term AS code_text, d.term AS code_text_short, ROW_NUMBER() OVER(ORDER BY id) AS code, '100' AS code_type,
 		'' AS modifier, 0 AS units, NULL AS fee, 0.0 AS superbill, '' AS related_code, '' AS taxrates, 0 AS cyp_factor,
@@ -174,5 +174,5 @@ INSERT INTO codes
 		AND d.term NOT LIKE '%(fármaco de uso clínico%'
 		AND d.term NOT LIKE '%(producto medicinal)'
 		GROUP BY code_text;		
-```	
+```sql	
 		
