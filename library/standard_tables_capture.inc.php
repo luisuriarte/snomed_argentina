@@ -30,7 +30,7 @@ function temp_copy($filename, $type)
 
     if (!file_exists($GLOBALS['temporary_files_dir'] . "/" . $type)) {
         if (!mkdir($GLOBALS['temporary_files_dir'] . "/" . $type, 0777, true)) {
-                return false;
+            return false;
         }
     }
 
@@ -95,7 +95,7 @@ function rxnorm_import($is_windows_flag)
 
     $rx_info = array();
     $rx_info['rxnatomarchive'] = array('title' => "Archive Data", 'dir' => "$dir", 'origin' => "RXNATOMARCHIVE.RRF", 'filename' => "RXNATOMARCHIVE.RRF", 'table' => "rxnatomarchive", 'required' => 0);
-    $rx_info['rxnconso'] = array('title' => "Concept Names and Sources", 'dir' => "$dir", 'origin' => "RXNCONSO.RRF", 'filename' => "RXNCONSO.RRF", 'table' => "rxnconso",  'required' => 1);
+    $rx_info['rxnconso'] = array('title' => "Concept Names and Sources", 'dir' => "$dir", 'origin' => "RXNCONSO.RRF", 'filename' => "RXNCONSO.RRF", 'table' => "rxnconso", 'required' => 1);
     $rx_info['rxncui'] = array('title' => "Retired RXCUI Data", 'dir' => "$dir", 'origin' => "RXNCUI.RRF", 'filename' => "RXNCUI.RRF", 'table' => "rxncui", 'required' => 1);
     $rx_info['rxncuichanges'] = array('title' => "Concept Changes", 'dir' => "$dir", 'origin' => "RXNCUICHANGES.RRF", 'filename' => "RXNCUICHANGES.RRF", 'table' => "rxncuichanges", 'required' => 1);
     $rx_info['rxndoc'] = array('title' => "Documentation for Abbreviated Values", 'dir' => "$dir", 'origin' => "RXNDOC.RRF", 'filename' => "RXNDOC.RRF", 'table' => "rxndoc", 'required' => 1);
@@ -242,19 +242,19 @@ function snomed_import($us_extension = false)
                 if (is_dir($path) && $handle1 = opendir($path)) {
                     while (false !== ($filename1 = readdir($handle1))) {
                         $load_script = "Load data local infile '#FILENAME#' into table #TABLE# fields terminated by '\\t' ESCAPED BY '' lines terminated by '\\n' ignore 1 lines   ";
-                        $array_replace = array("#FILENAME#","#TABLE#");
+                        $array_replace = array("#FILENAME#", "#TABLE#");
                         if ($filename1 != "." && $filename1 != "..") {
                             $file_replace = $path . $filename1;
                             if (strpos($filename1, "Concepts") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct_concepts"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct_concepts"), $load_script);
                             }
 
                             if (strpos($filename1, "Descriptions") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct_descriptions"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct_descriptions"), $load_script);
                             }
 
                             if (strpos($filename1, "Relationships") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct_relationships"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct_relationships"), $load_script);
                             }
 
                             if ($new_str != '') {
@@ -302,7 +302,7 @@ function drop_old_sct2()
         "sct2_description_drop" => "DROP TABLE IF EXISTS `sct2_description`",
         "sct2_identifier_drop" => "DROP TABLE IF EXISTS `sct2_identifier`",
         "sct2_relationship_drop" => "DROP TABLE IF EXISTS `sct2_relationship`",
-        "sct2_refset_drop" => "DROP TABLE IF EXISTS `sct2_refset`",		
+        "sct2_refset_drop" => "DROP TABLE IF EXISTS `sct2_refset`",
         "sct2_statedrelationship_drop" => "DROP TABLE IF EXISTS `sct2_statedrelationship`",
         "sct2_textdefinition_drop" => "DROP TABLE IF EXISTS `sct2_textdefinition`"
     );
@@ -397,7 +397,7 @@ function snomedRF2_import()
 			`referencedComponentId` bigint(25) NOT NULL,
 			`owlExpression` text NOT NULL,
              PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB",			
+            ) ENGINE=InnoDB",
         "sct2_statedrelationship_drop" => "DROP TABLE IF EXISTS `sct2_statedrelationship`",
         "sct2_statedrelationship_structure" => "CREATE TABLE IF NOT EXISTS `sct2_statedrelationship` (
             `id` bigint(20) NOT NULL,
@@ -434,7 +434,7 @@ function snomedRF2_import()
     // executing the create statement for tables, these are defined in snomed_capture.inc file
     // this is skipped if the US extension is being added
     //if (!$us_extension) {
-        //var_dump($us_extension);
+    //var_dump($us_extension);
     foreach ($table_array_for_snomed as $val) {
         if (trim($val) != '') {
             sqlStatement($val);
@@ -453,29 +453,29 @@ function snomedRF2_import()
                 if (is_dir($path) && $handle1 = opendir($path)) {
                     while (false !== ($filename1 = readdir($handle1))) {
                         $load_script = "Load data local infile '#FILENAME#' into table #TABLE# fields terminated by '\\t' ESCAPED BY '' lines terminated by '\\n' ignore 1 lines   ";
-                        $array_replace = array("#FILENAME#","#TABLE#");
+                        $array_replace = array("#FILENAME#", "#TABLE#");
                         if ($filename1 != "." && $filename1 != "..") {
                             $file_replace = $path . $filename1;
                             if (strpos($filename1, "Concept") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_concept"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_concept"), $load_script);
                             }
                             if (strpos($filename1, "Description") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_description"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_description"), $load_script);
                             }
                             if (strpos($filename1, "Identifier") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_identifier"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_identifier"), $load_script);
                             }
                             if (strpos($filename1, "Relationship") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_relationship"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_relationship"), $load_script);
                             }
                             if (strpos($filename1, "sRefset") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_refset"), $load_script);
-                            }							
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_refset"), $load_script);
+                            }
                             if (strpos($filename1, "StatedRelationship") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_statedrelationship"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_statedrelationship"), $load_script);
                             }
                             if (strpos($filename1, "TextDefinition") !== false) {
-                                $new_str = str_replace($array_replace, array($file_replace,"sct2_textdefinition"), $load_script);
+                                $new_str = str_replace($array_replace, array($file_replace, "sct2_textdefinition"), $load_script);
                             }
                             if ($new_str != '') {
                                 sqlStatement($new_str);
@@ -526,8 +526,12 @@ function icd_import($type)
     $next_rev = ($res['rev'] ?? 0) + 1;
     $incoming['icd10pcs_codes_'] = array(
         'TABLENAME' => "icd10_pcs_order_code",
-        'FLD1' => "pcs_code", 'POS1' => 0, 'LEN1' => 7,
-        'FLD2' => "long_desc", 'POS2' => 8, 'LEN2' => 300,
+        'FLD1' => "pcs_code",
+        'POS1' => 0,
+        'LEN1' => 7,
+        'FLD2' => "long_desc",
+        'POS2' => 8,
+        'LEN2' => 300,
         'REV' => $next_rev
     );
 
@@ -535,10 +539,18 @@ function icd_import($type)
     $next_rev = ($res['rev'] ?? 0) + 1;
     $incoming['icd10cm_order_'] = array(
         'TABLENAME' => "icd10_dx_order_code",
-        'FLD1' => "dx_code", 'POS1' => 6, 'LEN1' => 7,
-        'FLD2' => "valid_for_coding", 'POS2' => 14, 'LEN2' => 1,
-        'FLD3' => "short_desc", 'POS3' => 16, 'LEN3' => 60,
-        'FLD4' => "long_desc", 'POS4' => 77, 'LEN4' => 300,
+        'FLD1' => "dx_code",
+        'POS1' => 6,
+        'LEN1' => 7,
+        'FLD2' => "valid_for_coding",
+        'POS2' => 14,
+        'LEN2' => 1,
+        'FLD3' => "short_desc",
+        'POS3' => 16,
+        'LEN3' => 60,
+        'FLD4' => "long_desc",
+        'POS4' => 77,
+        'LEN4' => 300,
         'REV' => $next_rev
     );
 
@@ -635,8 +647,8 @@ function valueset_import($type)
                 continue;
             }
             if (stripos($filename, ".xml")) {
-                    $abs_path = $dir . $filename;
-                    $xml  = simplexml_load_file($abs_path, null, 0, 'ns0', true);
+                $abs_path = $dir . $filename;
+                $xml = simplexml_load_file($abs_path, null, 0, 'ns0', true);
                 foreach ($xml->DescribedValueSet as $vset) {
                     $vset_attr = $vset->attributes();
                     $nqf = $vset->xpath('ns0:Group[@displayName="NQF Number"]/ns0:Keyword');
@@ -668,7 +680,7 @@ function valueset_import($type)
                                         (string) $nqf_code,
                                         (string) $vset_attr->ID,
                                         (string) $con_attr->codeSystem,
-                                         'OID',
+                                        'OID',
                                         (string) $vset_attr->ID,
                                         (string) $vset_attr->displayName,
                                         (string) $vset_attr->displayName
@@ -696,7 +708,7 @@ function valueset_import($type)
         $codeTypeInstalledEvent = new CodeTypeInstalledEvent('CQM_VALUESET', ['type' => $type]);
         $GLOBALS['kernel']->getEventDispatcher()->dispatch($codeTypeInstalledEvent, CodeTypeInstalledEvent::EVENT_INSTALLED_POST);
     }
-        return true;
+    return true;
 }
 
 // Function to clean up temp files
@@ -755,13 +767,13 @@ function rmdir_recursive($dir)
 // function to cleanup temp, copy and unarchive the zip file
 function handle_zip_file($mode, $file)
 {
-        // 1. copy the file to temp directory
+    // 1. copy the file to temp directory
     if (!temp_copy($file, $mode)) {
         echo htmlspecialchars(xl('ERROR: Unable to copy the file.'), ENT_NOQUOTES) . "<br />";
         temp_dir_cleanup($mode);
         exit;
     }
-        // 2. unarchive the file
+    // 2. unarchive the file
     if (!temp_unarchive($file, $mode)) {
         echo htmlspecialchars(xl('ERROR: Unable to extract the file.'), ENT_NOQUOTES) . "<br />";
         temp_dir_cleanup($mode);
