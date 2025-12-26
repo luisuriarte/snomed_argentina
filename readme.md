@@ -305,7 +305,7 @@ LOAD DATA LOCAL INFILE './der2_Refset_OdontogramSimpleFull_INT_20250701.txt' INT
 ```	
 Ahora llenamos las tablas sct2_description_dental y sct2_description_odonto con los scripts sql:
 
-```mysql
+```sql
 INSERT IGNORE INTO sct2_description_odonto 
 (id, effectiveTime, active, moduleId, conceptId, languageCode, typeId, term, caseSignificanceId)
 SELECT 
@@ -333,7 +333,7 @@ WHERE r.refsetId = '721145008'
 GROUP BY d.term;
 ```
 
-```mysql
+```sql
 INSERT IGNORE INTO sct2_description_dental 
 (id, effectiveTime, active, moduleId, conceptId, languageCode, typeId, term, caseSignificanceId)
 SELECT 
