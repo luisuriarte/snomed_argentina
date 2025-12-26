@@ -294,8 +294,7 @@ Luego descomprimimos y tomamos el archivo de la carpeta Full\Terminology\sct2_De
 LOAD DATA LOCAL INFILE './sct2_Description_Full-en_INT_AAAMMDD.txt' INTO TABLE sct2_description FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES; -- ≈ 810Mb
 ```
 
-Luego bajamos los archivos: SnomedCT_Odontogram_PRODUCTION_20250930T120000Z.zip y SnomedCT_GeneralDentistry_PRODUCTION_20250930T120000Z.zip, descomprimimos y tomamos los archivos de la carpeta Full/Refset/Content/  der2_Refset_DentistrySimpleFull_INT_20250701.txt y der2_Refset_OdontogramSimpleFull_INT_20250701.txt
-y en mysql ejecutamos:
+Luego bajamos los archivos: SnomedCT_Odontogram_PRODUCTION_20250930T120000Z.zip y SnomedCT_GeneralDentistry_PRODUCTION_20250930T120000Z.zip, descomprimimos y tomamos los archivos de la carpeta Full/Refset/Content/  der2_Refset_DentistrySimpleFull_INT_20250701.txt y der2_Refset_OdontogramSimpleFull_INT_20250701.txt y en mysql ejecutamos:
 ```mysql
 LOAD DATA LOCAL INFILE './der2_Refset_DentistrySimpleFull_INT_20250701.txt' INTO TABLE sct2_refset_dental FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 ```
