@@ -177,7 +177,7 @@ INSERT INTO codes
 ```	
 Incluir Prestaciones (Practicas) de una clínica en los códigos.
 Primero en Tipos de Códigos se debe agregar uno (Por ejemplo Prestaciones) con un codigo (Seq.) 120 y se debe marcar tarifas y procedimientos.
-Para asegurarno uno nuevo primero borrar códigos viejos:
+Para asegurarnos que sea uno nuevo, primero borrar códigos viejos:
 ```sql
 DELETE FROM codes WHERE code_type = '120';
 ```
@@ -197,4 +197,168 @@ INSERT INTO codes
 		AND d.term NOT LIKE '%(procedimiento)'
 		GROUP BY code_text;		
 ```	
+Practicas dentales y odontogramas del paquete SNOMED Internacioneal (En inglés)
+Necesitamos importar, primero la tabla de descripciones del archivo: SnomedCT_InternationalRF2_PRODUCTION_AAAAMMDDT120000Z.zip
+Donde AAAA es el año, MM es el mes y DD es el dia.
+Creamos las tablas:
+```sql
+-- snomed.sct2_description definition
+CREATE TABLE `sct2_description` (
+  `id` bigint(20) NOT NULL,
+  `effectiveTime` date NOT NULL,
+  `active` bigint(11) NOT NULL,
+  `moduleId` bigint(25) NOT NULL,
+  `conceptId` bigint(20) NOT NULL,
+  `languageCode` varchar(8) NOT NULL,
+  `typeId` bigint(25) NOT NULL,
+  `term` varchar(255) NOT NULL,
+  `caseSignificanceId` bigint(25) NOT NULL,
+  PRIMARY KEY (`id`,`active`,`conceptId`),
+  KEY `idx_concept_id` (`conceptId`),
+  KEY `idx_term` (`term`),
+  KEY `idx_active_term` (`active`,`term`),
+  FULLTEXT KEY `ft_term` (`term`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+```
+
+```sql
+-- snomed.sct2_description_dental definition
+CREATE TABLE `sct2_description_dental` (
+  `id` bigint(20) NOT NULL,
+  `effectiveTime` date NOT NULL,
+  `active` bigint(11) NOT NULL,
+  `moduleId` bigint(25) NOT NULL,
+  `conceptId` bigint(20) NOT NULL,
+  `languageCode` varchar(8) NOT NULL,
+  `typeId` bigint(25) NOT NULL,
+  `term` varchar(255) NOT NULL,
+  `caseSignificanceId` bigint(25) NOT NULL,
+  PRIMARY KEY (`id`,`active`,`conceptId`),
+  KEY `idx_active_term` (`active`,`term`) USING BTREE,
+  KEY `idx_concept_id` (`conceptId`) USING BTREE,
+  KEY `idx_term` (`term`) USING BTREE,
+  FULLTEXT KEY `ft_term` (`term`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+```
+
+```sql
+-- snomed.sct2_description_odonto definition
+CREATE TABLE `sct2_description_odonto` (
+  `id` bigint(20) NOT NULL,
+  `effectiveTime` date NOT NULL,
+  `active` bigint(11) NOT NULL,
+  `moduleId` bigint(25) NOT NULL,
+  `conceptId` bigint(20) NOT NULL,
+  `languageCode` varchar(8) NOT NULL,
+  `typeId` bigint(25) NOT NULL,
+  `term` varchar(255) NOT NULL,
+  `caseSignificanceId` bigint(25) NOT NULL,
+  PRIMARY KEY (`id`,`active`,`conceptId`),
+  KEY `idx_active_term` (`active`,`term`) USING BTREE,
+  KEY `idx_concept_id` (`conceptId`) USING BTREE,
+  KEY `idx_term` (`term`) USING BTREE,
+  FULLTEXT KEY `ft_term` (`term`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+```
+
+```sql
+-- snomed.sct2_refset_dental definition
+CREATE TABLE `sct2_refset_dental` (
+  `id` varchar(80) NOT NULL,
+  `effectiveTime` date NOT NULL,
+  `active` int(11) NOT NULL,
+  `moduleId` bigint(20) NOT NULL,
+  `refsetId` bigint(25) NOT NULL,
+  `referencedComponentId` bigint(25) NOT NULL,
+  `owlExpression` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+```
+
+```sql
+-- snomed.sct2_refset_odonto definition
+CREATE TABLE `sct2_refset_odonto` (
+  `id` varchar(80) NOT NULL,
+  `effectiveTime` date NOT NULL,
+  `active` int(11) NOT NULL,
+  `moduleId` bigint(20) NOT NULL,
+  `refsetId` bigint(25) NOT NULL,
+  `referencedComponentId` bigint(25) NOT NULL,
+  `owlExpression` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+```
+
+Luego descomprimimos y tomamos el archivo de la carpeta Full\Terminology\sct2_sRefset_OWLExpressionFull_INT_AAAMMDD.txt
+y en mysql ejecutamos:
+```mysql
+LOAD DATA LOCAL INFILE './sct2_sRefset_OWLExpressionFull_INT_AAAMMDD.txt' INTO TABLE sct2_description FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES; -- ≈ 1.8Gb
+```
+
+Luego bajamos los archivos: SnomedCT_Odontogram_PRODUCTION_20250930T120000Z.zip y SnomedCT_GeneralDentistry_PRODUCTION_20250930T120000Z.zip, descomprimimos y tomamos los archivos de la carpeta Full/Refset/Content/  der2_Refset_DentistrySimpleFull_INT_20250701.txt y der2_Refset_OdontogramSimpleFull_INT_20250701.txt
+y en mysql ejecutamos:
+```mysql
+LOAD DATA LOCAL INFILE './der2_Refset_DentistrySimpleFull_INT_20250701.txt' INTO TABLE sct2_refset_dental FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES; -- ≈ 1.8Gb
+```
+```mysql
+LOAD DATA LOCAL INFILE './der2_Refset_OdontogramSimpleFull_INT_20250701.txt' INTO TABLE sct2_refset_odonto FIELDS TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n' IGNORE 1 LINES; -- ≈ 1.8Gb
+```	
+Ahora llenamos las tablas sct2_description_dental y sct2_description_odonto con los scripts sql:
+
+```mysql
+INSERT IGNORE INTO sct2_description_odonto 
+(id, effectiveTime, active, moduleId, conceptId, languageCode, typeId, term, caseSignificanceId)
+SELECT 
+    d.id, 
+    d.effectiveTime, 
+    d.active, 
+    d.moduleId, 
+    d.conceptId, 
+    d.languageCode, 
+    d.typeId, 
+    d.term, 
+    d.caseSignificanceId
+FROM sct2_description AS d
+INNER JOIN sct2_refset_odonto AS r
+    ON r.referencedComponentId = d.conceptId
+WHERE r.refsetId = '721145008'
+  AND r.active = 1
+  AND d.active = 1
+  AND d.effectiveTime > '2003-10-31'
+  AND d.term NOT LIKE '%(procedure)'
+  AND d.term NOT LIKE '%(disorder)'
+  AND d.term NOT LIKE '%(situation)'
+  AND d.term NOT LIKE '%(body structure)'
+  AND d.term NOT LIKE '%(observable entity)'
+GROUP BY d.term;
+```
+
+```mysql
+INSERT IGNORE INTO sct2_description_dental 
+(id, effectiveTime, active, moduleId, conceptId, languageCode, typeId, term, caseSignificanceId)
+SELECT 
+    d.id, 
+    d.effectiveTime, 
+    d.active, 
+    d.moduleId, 
+    d.conceptId, 
+    d.languageCode, 
+    d.typeId, 
+    d.term, 
+    d.caseSignificanceId
+FROM sct2_description AS d
+INNER JOIN sct2_refset_dental AS r
+    ON r.referencedComponentId = d.conceptId
+WHERE r.refsetId = '721145008'
+  AND r.active = 1
+  AND d.active = 1
+  AND d.effectiveTime > '2003-10-31'
+  AND d.term NOT LIKE '%(procedure)'
+  AND d.term NOT LIKE '%(disorder)'
+  AND d.term NOT LIKE '%(situation)'
+  AND d.term NOT LIKE '%(body structure)'
+  AND d.term NOT LIKE '%(observable entity)'
+GROUP BY d.term;
+```
+
 
