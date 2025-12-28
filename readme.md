@@ -227,16 +227,11 @@ CREATE TABLE `sct2_description_dental` (
   `id` bigint(20) NOT NULL,
   `effectiveTime` date NOT NULL,
   `active` bigint(11) NOT NULL,
-  `moduleId` bigint(25) NOT NULL,
   `conceptId` bigint(20) NOT NULL,
   `languageCode` varchar(8) NOT NULL,
-  `typeId` bigint(25) NOT NULL,
   `term` varchar(255) NOT NULL,
-  `caseSignificanceId` bigint(25) NOT NULL,
   PRIMARY KEY (`id`,`active`,`conceptId`),
-  KEY `idx_active_term` (`active`,`term`) USING BTREE,
   KEY `idx_concept_id` (`conceptId`) USING BTREE,
-  KEY `idx_term` (`term`) USING BTREE,
   FULLTEXT KEY `ft_term` (`term`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ```
@@ -247,16 +242,11 @@ CREATE TABLE `sct2_description_odonto` (
   `id` bigint(20) NOT NULL,
   `effectiveTime` date NOT NULL,
   `active` bigint(11) NOT NULL,
-  `moduleId` bigint(25) NOT NULL,
   `conceptId` bigint(20) NOT NULL,
   `languageCode` varchar(8) NOT NULL,
-  `typeId` bigint(25) NOT NULL,
   `term` varchar(255) NOT NULL,
-  `caseSignificanceId` bigint(25) NOT NULL,
   PRIMARY KEY (`id`,`active`,`conceptId`),
-  KEY `idx_active_term` (`active`,`term`) USING BTREE,
   KEY `idx_concept_id` (`conceptId`) USING BTREE,
-  KEY `idx_term` (`term`) USING BTREE,
   FULLTEXT KEY `ft_term` (`term`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ```
@@ -305,17 +295,14 @@ Ahora llenamos las tablas sct2_description_dental y sct2_description_odonto con 
 
 ```sql
 INSERT IGNORE INTO sct2_description_odonto 
-(id, effectiveTime, active, moduleId, conceptId, languageCode, typeId, term, caseSignificanceId)
+(id, effectiveTime, active,conceptId, languageCode, term)
 SELECT 
     d.id, 
     d.effectiveTime, 
     d.active, 
-    d.moduleId, 
     d.conceptId, 
     d.languageCode, 
-    d.typeId, 
-    d.term, 
-    d.caseSignificanceId
+    d.term 
 FROM sct2_description AS d
 INNER JOIN sct2_refset_odonto AS r
     ON r.referencedComponentId = d.conceptId
@@ -333,17 +320,14 @@ GROUP BY d.term;
 
 ```sql
 INSERT IGNORE INTO sct2_description_dental 
-(id, effectiveTime, active, moduleId, conceptId, languageCode, typeId, term, caseSignificanceId)
+(id, effectiveTime, active, conceptId, languageCode, term)
 SELECT 
     d.id, 
     d.effectiveTime, 
     d.active, 
-    d.moduleId, 
     d.conceptId, 
     d.languageCode, 
-    d.typeId, 
-    d.term, 
-    d.caseSignificanceId
+    d.term
 FROM sct2_description AS d
 INNER JOIN sct2_refset_dental AS r
     ON r.referencedComponentId = d.conceptId
