@@ -241,4 +241,39 @@ SELECT `code_type`, COUNT(*) AS `codigos`
  GROUP BY `code_type`
  ORDER BY `code_type`;
 
+-- -----------------------------------------------------------------------------
+-- 10) Mapeos Excel NBU y GTIN (sólo si se ejecutó 05_map_excel.sql)
+-- -----------------------------------------------------------------------------
+SELECT 'sct2_map_nbu' AS `tabla`, 425 AS `esperado`, COUNT(*) AS `obtenido`,
+       IF(COUNT(*) = 425, 'OK', 'REVISAR') AS `estado`
+  FROM `sct2_map_nbu`
+UNION ALL
+SELECT 'sct2_map_gtin', 15500, COUNT(*),
+       IF(COUNT(*) = 15500, 'OK', 'REVISAR')
+  FROM `sct2_map_gtin`;
+
+-- Vistas derivadas de los mapeos Excel
+SELECT 'v_sct_map_nbu' AS `vista`, 425 AS `esperado`, COUNT(*) AS `obtenido`,
+       IF(COUNT(*) = 425, 'OK', 'REVISAR') AS `estado`
+  FROM `v_sct_map_nbu`
+UNION ALL
+SELECT 'v_sct_map_gtin', 15500, COUNT(*),
+       IF(COUNT(*) = 15500, 'OK', 'REVISAR')
+  FROM `v_sct_map_gtin`;
+
+-- Integridad: todas las entradas NBU deben tener su sctid en sct2_concept.
+SELECT 'NBU: sctids sin concepto SNOMED' AS `control`, 0 AS `esperado`,
+       COUNT(*) AS `obtenido`,
+       IF(COUNT(*) = 0, 'OK', 'REVISAR') AS `estado`
+  FROM `sct2_map_nbu` n
+  LEFT JOIN `sct2_concept` c ON c.`id` = n.`sctid`
+ WHERE c.`id` IS NULL
+UNION ALL
+-- Integridad: todos los RPCD del GTIN deben existir en sct2_concept.
+SELECT 'GTIN: rpcd_ids sin concepto SNOMED', 0, COUNT(*),
+       IF(COUNT(*) = 0, 'OK', 'REVISAR')
+  FROM `sct2_map_gtin` g
+  LEFT JOIN `sct2_concept` c ON c.`id` = g.`rpcd_id`
+ WHERE c.`id` IS NULL;
+
 SELECT 'Verificación terminada. Revisá que todas las filas digan OK.' AS resultado;

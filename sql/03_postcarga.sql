@@ -423,9 +423,104 @@ SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
   LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
  WHERE r.`refsetId` = 869651000221108 AND r.`active` = 1;
 
+-- 4.9  Especialidades reconocidas por el Ministerio de Salud de la Nación.
+CREATE OR REPLACE VIEW `v_sct_especialidad` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 331151000221108 AND r.`active` = 1;
+
+-- 4.10 Profesiones matriculadas vinculadas a la atención en salud.
+CREATE OR REPLACE VIEW `v_sct_profesion` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 2271000221108 AND r.`active` = 1;
+
+-- 4.11 Ocupaciones vinculadas a especialidades (Ministerio de Salud).
+CREATE OR REPLACE VIEW `v_sct_ocupacion` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 331131000221104 AND r.`active` = 1;
+
+-- 4.12 Fármacos del Programa Remediar / Medicamentos Esenciales del Ministerio.
+CREATE OR REPLACE VIEW `v_sct_remediar` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 349091000221101 AND r.`active` = 1;
+
+-- 4.13 Diagnósticos del Programa SUMAR (facturación).
+CREATE OR REPLACE VIEW `v_sct_sumar_diag` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 371191000221103 AND r.`active` = 1;
+
+-- 4.14 Procedimientos/prestaciones del Programa SUMAR (facturación).
+CREATE OR REPLACE VIEW `v_sct_sumar_proced` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 371201000221100 AND r.`active` = 1;
+
+-- 4.15 Ámbitos de atención del Programa SUMAR.
+CREATE OR REPLACE VIEW `v_sct_sumar_ambito` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 371221000221107 AND r.`active` = 1;
+
+-- 4.16 Profesionales de salud vinculados al Programa SUMAR.
+CREATE OR REPLACE VIEW `v_sct_sumar_profesional` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 371211000221102 AND r.`active` = 1;
+
+-- 4.17 Pueblos originarios argentinos reconocidos por el Ministerio de Salud.
+CREATE OR REPLACE VIEW `v_sct_pueblo_originario` AS
+SELECT r.`referencedComponentId` AS `conceptoId`, tp.`term` AS `termino`
+  FROM `sct2_refset_simple` r
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = r.`referencedComponentId`
+ WHERE r.`refsetId` = 93491000221103 AND r.`active` = 1;
+
+-- 4.18 Mapeo SNOMED CT → NOMIVAC (vacunas). Refset de mapa simple.
+--      Columna mapTarget contiene el código NOMIVAC.
+CREATE OR REPLACE VIEW `v_sct_nomivac` AS
+SELECT sm.`referencedComponentId` AS `conceptoId`,
+       tp.`term`                  AS `termino`,
+       sm.`mapTarget`             AS `codigoNOMIVAC`
+  FROM `sct2_refset_simplemap` sm
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = sm.`referencedComponentId`
+ WHERE sm.`refsetId` = 401211000221103 AND sm.`active` = 1;
+
+-- 4.19 Mapeo SNOMED CT → Nomenclador Bioquímico Único (NBU).
+--      Requiere haber ejecutado 05_map_excel.sql.
+CREATE OR REPLACE VIEW `v_sct_map_nbu` AS
+SELECT n.`sctid`,
+       tp.`term`          AS `practica_sct`,
+       n.`codigoNBU`,
+       n.`determinacion`  AS `determinacion_nbu`
+  FROM `sct2_map_nbu` n
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = n.`sctid`;
+
+-- 4.20 Mapeo GTIN → Presentación farmacéutica comercial SNOMED CT.
+--      Requiere haber ejecutado 05_map_excel.sql.
+CREATE OR REPLACE VIEW `v_sct_map_gtin` AS
+SELECT g.`gtin`,
+       g.`condicion`,
+       g.`rpcd_id`   AS `sctid`,
+       tp.`term`     AS `termino_sct`,
+       g.`rpcd_fsn`  AS `fsn`
+  FROM `sct2_map_gtin` g
+  LEFT JOIN `sct2_termino_preferido` tp ON tp.`conceptId` = g.`rpcd_id`;
+
 -- -----------------------------------------------------------------------------
 -- 5) Análisis de estadísticas
 -- -----------------------------------------------------------------------------
+-- Nota: sct2_map_nbu y sct2_map_gtin se analizan en 05_map_excel.sql.
 ANALYZE TABLE `sct2_concept`, `sct2_description`, `sct2_relationship`,
                `sct2_refset_simple`, `sct2_refset_language`,
                `sct2_termino_preferido`, `sct2_termino_busqueda`,

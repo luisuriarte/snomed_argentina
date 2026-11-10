@@ -420,4 +420,30 @@ CREATE TABLE `sct2_marca_generico` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
   COMMENT='Vínculo entre marcas comerciales y genéricos, con los atributos del DNM asociados.';
 
+-- Mapeo SNOMED CT → Nomenclador Bioquímico Único (NBU) 2012/2026.
+-- Fuente: Mapeo_NBU_SCT_Agosto26.xlsx distribuido en la carpeta Resources/
+-- del paquete SNOMED CT Argentina 2026-08-20. 425 pares SCT→NBU.
+DROP TABLE IF EXISTS `sct2_map_nbu`;
+CREATE TABLE `sct2_map_nbu` (
+  `sctid`         BIGINT UNSIGNED NOT NULL  COMMENT 'Concepto SNOMED CT de la práctica de laboratorio.',
+  `codigoNBU`     INT UNSIGNED    NOT NULL  COMMENT 'Código numérico del Nomenclador Bioquímico Único (NBU PMO, versión 2016).',
+  `determinacion` VARCHAR(512)    NOT NULL  COMMENT 'Nombre de la determinación según el NBU.',
+  PRIMARY KEY (`sctid`, `codigoNBU`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  COMMENT='Mapeo SNOMED CT → Nomenclador Bioquímico Único 2012/2026 (NRC Argentina, agosto 2026).';
+
+-- Mapeo GTIN (código de barras EAN-13) → Presentación comercial SNOMED CT.
+-- Fuente: MAP_GTIN_a_RPCD_comercializadas_20260820.xlsx en Resources/.
+-- 15.500 GTINs en estado COMERCIALIZADO al 7-jul-2026.
+DROP TABLE IF EXISTS `sct2_map_gtin`;
+CREATE TABLE `sct2_map_gtin` (
+  `gtin`                   VARCHAR(20)     NOT NULL  COMMENT 'Global Trade Item Number (EAN-13/GTIN-14) del producto comercial.',
+  `condicion`              VARCHAR(30)     NOT NULL  COMMENT 'Estado de comercialización: COMERCIALIZADO u otro.',
+  `rpcd_id`                BIGINT UNSIGNED NOT NULL  COMMENT 'Concepto SNOMED CT de la presentación farmacéutica comercial (RPCD).',
+  `rpcd_fsn`               VARCHAR(1024)   NOT NULL  COMMENT 'Fully Specified Name de la presentación comercial en SNOMED CT.',
+  PRIMARY KEY (`gtin`),
+  KEY `idx_gtin_rpcd`      (`rpcd_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  COMMENT='Mapeo GTIN (código de barras) → Presentación farmacéutica comercial SNOMED CT (NRC Argentina, agosto 2026).';
+
 SELECT 'Esquema SNOMED Argentina creado. Siguiente paso: 02_carga.sql.' AS resultado;

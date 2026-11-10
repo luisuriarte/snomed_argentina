@@ -88,10 +88,12 @@ snomed_argentina/
 │   ├── 02_carga.sql                 <- GENERADO por el script: los LOAD DATA
 │   ├── 03_postcarga.sql             <- índices, tablas derivadas y vistas
 │   ├── 04_codigos_opcional.sql      <- publica conceptos en la tabla codes
+│   ├── 05_map_excel.sql             <- carga NBU y GTIN desde los CSV generados
 │   └── 99_verificacion.sql          <- controles de la carga (sólo SELECT)
 ├── scripts/
 │   ├── generar_carga.php            <- genera sql/02_carga.sql a partir del ZIP
-│   └── extraer_release.ps1          <- alternativa en PowerShell (sin ext-zip)
+│   ├── extraer_release.ps1          <- alternativa en PowerShell (sin ext-zip)
+│   └── convertir_excel_maps.py      <- convierte los Excel NBU/GTIN a CSV (requiere openpyxl)
 ├── interface/code_systems/
 │   └── list_staged.php              <- parche viejo, NO usar (ver apéndice D)
 └── library/
@@ -407,7 +409,74 @@ Después, en DBeaver-CE:
    lento, conviene subir los archivos al servidor y usar la opción A.
 5. `sql/03_postcarga.sql` → *Execute Script*.
 6. `sql/04_codigos_opcional.sql` → *Execute Script* (opcional).
-7. `sql/99_verificacion.sql` → *Execute Script* y revisar que todo diga `OK`.
+7. **Mapeos Excel NBU y GTIN** (opcional, ver sección 7.4).
+8. `sql/99_verificacion.sql` → *Execute Script* y revisar que todo diga `OK`.
+
+> En DBeaver hay que ejecutar los scripts **completo** (no sentencia por
+> sentencia) porque `03_postcarga.sql` usa `DELIMITER $$` para crear un
+> procedimiento auxiliar.
+
+### 7.3 Qué se ve al terminar
+
+| Script | Qué hace | Tiempo estimado |
+|---|---|---|
+| `01_esquema.sql` | Crea las tablas `sct2_*` y borra las vistas anteriores | segundos |
+| `02_carga.sql` | 11-15 bloques `LOAD DATA` (12-15 millones de filas) | 20-60 min (servidor) / 1-3 h (túnel) |
+| `03_postcarga.sql` | Índices + 5 tablas derivadas + 21 vistas | 10-25 min |
+| `04_codigos_opcional.sql` | ~9.600 filas en `codes` | segundos |
+| `05_map_excel.sql` | 425 filas NBU + 15.500 filas GTIN | segundos |
+| `99_verificacion.sql` | Controles | segundos |
+
+### 7.4 Carga de los mapeos Excel (NBU y GTIN)
+
+El paquete SNOMED CT Argentina incluye en la carpeta `Resources/` del ZIP dos
+archivos Excel adicionales que **no forman parte del Snapshot RF2** pero son
+igualmente publicados por el NRC Argentina:
+
+| Archivo | Contenido | Filas |
+|---|---|---|
+| `Mapeo_NBU_SCT_Agosto26.xlsx` | SNOMED CT → Nomenclador Bioquímico Único 2012/2026 | 425 |
+| `MAP_GTIN_a_RPCD_comercializadas_20260820.xlsx` | GTIN (código de barras) → Presentación SNOMED CT | 15.500 |
+
+**Paso 1 — Convertir a CSV:**
+
+```bash
+# Requiere Python 3 y openpyxl:
+pip install openpyxl
+
+python scripts/convertir_excel_maps.py \
+  "D:\docs\luis\Documentos\sitios\openemr\codigos\SNOMED\sct_carga_20260820\Resources"
+```
+
+Genera en la misma carpeta:
+- `Mapeo_NBU_SCT_Agosto26.csv`
+- `MAP_GTIN_a_RPCD_comercializadas_20260820.csv`
+
+**Paso 2 — Ejecutar la carga:**
+
+```sql
+-- En DBeaver: abrir y ejecutar como Script completo
+sql/05_map_excel.sql
+```
+
+**Tablas creadas:** `sct2_map_nbu` · `sct2_map_gtin`  
+**Vistas creadas:** `v_sct_map_nbu` · `v_sct_map_gtin`
+
+**Consultas de ejemplo:**
+
+```sql
+-- Buscar el código NBU de una práctica de laboratorio por nombre SNOMED
+SELECT * FROM v_sct_map_nbu WHERE practica_sct LIKE '%glucosa%';
+
+-- Buscar la presentación SNOMED a partir del código de barras
+SELECT * FROM v_sct_map_gtin WHERE gtin = '07790001234567';
+
+-- Ver todas las presentaciones GTIN de un medicamento genérico
+SELECT g.gtin, g.termino_sct
+  FROM v_sct_map_gtin g
+  JOIN sct2_marca_generico mg ON mg.marcaId = g.sctid
+ WHERE mg.genericoId = 123456789;  -- reemplazar con el SCTID del genérico
+```
 
 > En DBeaver hay que ejecutar los scripts **completo** (no sentencia por
 > sentencia) porque `03_postcarga.sql` usa `DELIMITER $$` para crear un
