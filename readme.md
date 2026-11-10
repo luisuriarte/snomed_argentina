@@ -427,6 +427,38 @@ Después, en DBeaver-CE:
 
 ## 8. Modelo de datos
 
+Cada tabla y cada columna de `01_esquema.sql` tiene su `COMMENT` con la
+definición oficial del campo. La fuente es la especificación de SNOMED
+International en **Release Format 2 (RF2)**:
+
+- <https://docs.snomed.org/snomed-ct-specifications/snomed-ct-release-file-specification>
+  - Apéndice B *Specification Reference Information*: definición de cada campo
+    (`id`, `effectiveTime`, `active`, `moduleId`, `typeId`, `term`,
+    `relationshipGroup`, `acceptabilityId`, `mapTarget`, `mapRule`, ...).
+  - Capítulo 4 *File Format Specifications*: estructura de los archivos de
+    concepto, descripción, relación, relación declarada, identificador y
+    valor concreto.
+  - Capítulo 5 *Reference Set Release File Specification*: estructura de los
+    refsets (simple, de idioma, de valor de atributo, de asociación, de mapa
+    simple, de mapa extendido, de expresión OWL).
+  - Apéndice E: enumeraciones de conceptos para `moduleId`,
+    `definitionStatusId`, `typeId`, `caseSignificanceId`,
+    `characteristicTypeId` y `modifierId`.
+
+Los valores concretos que aparecen en los comentarios (por ejemplo
+`900000000000073002` = definido por condiciones necesarias suficientes) se
+verificaron además contra los datos de la release 2026-08-20.
+
+Las columnas del refset de productos medicinales del DNM
+(`referencedComponentIdRCD`, `referencedComponentIdCD_UP`,
+`referencedComponentIdCD`, `referencedComponentIdMPFonlyId`,
+`referencedComponentIdMPonlyId`, `referenceComponentIdMP`) **no están en la
+especificación RF2 internacional**: son del modelo de datos del Diccionario
+Nacional de Medicamentos del CNTS (MP = producto medicinal, MPF = forma de
+presentación, CD = medicamento genérico, CD_UP = genérico con unidad de
+presentación definida, RCD = genérico de referencia), y así están aclarados en
+el comentario de la tabla.
+
 ### 8.1 Tablas de terminología (RF2)
 
 | Tabla | Origen | Filas (2026-08-20) |
