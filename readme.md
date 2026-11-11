@@ -88,7 +88,7 @@ snomed_argentina/
 │   ├── 02_carga.sql                 <- GENERADO por el script: los LOAD DATA
 │   ├── 03_postcarga.sql             <- índices, tablas derivadas y vistas
 │   ├── 04_codigos_opcional.sql      <- publica conceptos en la tabla codes
-│   ├── 05_map_excel.sql             <- carga NBU y GTIN desde los CSV generados
+│   ├── 05_map_excel.sql             <- carga NBU y GTIN desde los CSV generados (opcional)
 │   └── 99_verificacion.sql          <- controles de la carga (sólo SELECT)
 ├── scripts/
 │   ├── generar_carga.php            <- genera sql/02_carga.sql a partir del ZIP
@@ -358,6 +358,7 @@ mysql -u USUARIO -p BASE < sql/01_esquema.sql
 mysql -u USUARIO -p --local-infile=1 BASE < sql/02_carga.sql
 mysql -u USUARIO -p BASE < sql/03_postcarga.sql
 mysql -u USUARIO -p BASE < sql/04_codigos_opcional.sql   # opcional
+mysql -u USUARIO -p BASE < sql/05_map_excel.sql           # opcional (ver paso previo con Python)
 mysql -u USUARIO -p BASE < sql/99_verificacion.sql
 ```
 
