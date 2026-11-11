@@ -463,16 +463,46 @@ sql/05_map_excel.sql
 **Tablas creadas:** `sct2_map_nbu` · `sct2_map_gtin`  
 **Vistas creadas:** `v_sct_map_nbu` · `v_sct_map_gtin`
 
+#### Formato del GTIN
+
+El campo `gtin` siempre tiene **14 dígitos** con ceros a la izquierda — es el
+formato canónico GS1 (GTIN-14). El tipo de código de barras real que figura en
+el envase depende de los dígitos significativos. Distribución en este mapeo:
+
+| Ceros iniciales | Dígitos sig. | Tipo GS1 | Cantidad | % |
+|---|---|---|---|---|
+| 1 | 13 | **EAN-13** ← dominante | 15.430 | 99,5 % |
+| 2 | 12 | UPC-A | 42 | 0,3 % |
+| 0 | 14 | GTIN-14 nativo (ITF-14) | 10 | <0,1 % |
+| 3 | 11 | Indeterminado | 15 | <0,1 % |
+| 6 | 8 | EAN-8 | 3 | <0,1 % |
+
+El **99,5 % son EAN-13**: el código de barras lineal estándar de GS1 Argentina
+para productos farmacéuticos (el que se lee con cualquier lector de pistola).
+
+Para comparar con la lectura de un lector (que devuelve 13 dígitos sin el cero
+inicial de relleno):
+
+```sql
+-- Si el lector entrega el EAN-13 directamente (13 dígitos)
+SELECT * FROM v_sct_map_gtin
+ WHERE gtin = LPAD('7790001234567', 14, '0');
+
+-- Alternativa: comparación flexible
+SELECT * FROM v_sct_map_gtin
+ WHERE LTRIM(REPLACE(gtin, '0', '')) = LTRIM(REPLACE('7790001234567', '0', ''));
+```
+
 **Consultas de ejemplo:**
 
 ```sql
 -- Buscar el código NBU de una práctica de laboratorio por nombre SNOMED
 SELECT * FROM v_sct_map_nbu WHERE practica_sct LIKE '%glucosa%';
 
--- Buscar la presentación SNOMED a partir del código de barras
-SELECT * FROM v_sct_map_gtin WHERE gtin = '07790001234567';
+-- Buscar la presentación SNOMED a partir del código de barras EAN-13
+SELECT * FROM v_sct_map_gtin WHERE gtin = LPAD('7790001234567', 14, '0');
 
--- Ver todas las presentaciones GTIN de un medicamento genérico
+-- Ver todos los GTINs de un medicamento genérico
 SELECT g.gtin, g.termino_sct
   FROM v_sct_map_gtin g
   JOIN sct2_marca_generico mg ON mg.marcaId = g.sctid

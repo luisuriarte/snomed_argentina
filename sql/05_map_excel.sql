@@ -48,6 +48,21 @@ SELECT CONCAT('sct2_map_nbu cargada: ', COUNT(*), ' filas.') AS resultado
 -- =============================================================================
 -- B) Mapeo GTIN → Presentación farmacéutica comercial (RPCD)
 -- =============================================================================
+--
+-- El campo `gtin` se almacena en formato canónico GS1 (GTIN-14, 14 dígitos
+-- con ceros a la izquierda). El tipo de código de barras real del envase:
+--
+--   Ceros inic.  Dígitos sig.  Tipo GS1              Cantidad en este mapeo
+--   -----------  ------------  --------------------  -----------------------
+--   1            13            EAN-13  ← dominante   15.430  (99,5 %)
+--   2            12            UPC-A                     42  ( 0,3 %)
+--   0            14            GTIN-14 nativo (ITF-14)   10  (<0,1 %)
+--   3            11            Indeterminado             15  (<0,1 %)
+--   6             8            EAN-8                      3  (<0,1 %)
+--
+-- Para buscar desde un lector de código de barras (devuelve EAN-13, 13 dígitos):
+--   WHERE gtin = LPAD('7790001234567', 14, '0')
+-- =============================================================================
 
 TRUNCATE TABLE `sct2_map_gtin`;
 
