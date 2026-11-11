@@ -493,6 +493,45 @@ SELECT * FROM v_sct_map_gtin
  WHERE LTRIM(REPLACE(gtin, '0', '')) = LTRIM(REPLACE('7790001234567', '0', ''));
 ```
 
+#### Identificadores de Aplicación GS1 (AI) — lectura desde DataMatrix o GS1-128
+
+Los envases modernos (y los alcanzados por el SNT-PM de ANMAT) usan código
+**DataMatrix** (2D) o **GS1-128** (lineal apilado) que codifican múltiples
+datos en un solo símbolo mediante **Identificadores de Aplicación (AI)**:
+
+| AI | Dato | Longitud |
+|---|---|---|
+| `(01)` | **GTIN** ← el que va en `sct2_map_gtin` | 14 dígitos fijos |
+| `(21)` | Número de serie | hasta 20 caracteres |
+| `(10)` | Número de lote | alfanumérico |
+| `(17)` | Fecha de vencimiento | `AAMMDD` |
+
+> Fuente: Disposición ANMAT 2303/2014 · [FAQs SNT-PM](https://www.anmat.gob.ar/trazabilidad_PM/faqs.asp)
+
+> [!IMPORTANT]
+> El AI **no forma parte del GTIN**. Si la etiqueta dice `(01)07790001234567`,
+> el GTIN a buscar es `07790001234567` (solo los 14 dígitos que siguen al AI).
+
+**Ejemplo de string crudo que devuelve un lector DataMatrix:**
+```
+(01)07790001234567(21)AB12345(10)L2024(17)261231
+```
+
+**Parseo en PHP:**
+```php
+preg_match('/\(01\)(\d{14})/', $rawBarcode, $m);
+$gtin = $m[1]; // '07790001234567'
+
+// Buscar en la BD:
+$stmt = $pdo->prepare('SELECT * FROM v_sct_map_gtin WHERE gtin = ?');
+$stmt->execute([$gtin]);
+```
+
+**Parseo alternativo para lector EAN-13 lineal (devuelve solo 13 dígitos):**
+```php
+$gtin = str_pad($ean13, 14, '0', STR_PAD_LEFT);
+```
+
 **Consultas de ejemplo:**
 
 ```sql

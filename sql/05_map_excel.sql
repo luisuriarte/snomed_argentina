@@ -62,6 +62,27 @@ SELECT CONCAT('sct2_map_nbu cargada: ', COUNT(*), ' filas.') AS resultado
 --
 -- Para buscar desde un lector de código de barras (devuelve EAN-13, 13 dígitos):
 --   WHERE gtin = LPAD('7790001234567', 14, '0')
+--
+-- IDENTIFICADORES DE APLICACIÓN GS1 (AI) — lectura desde DataMatrix / GS1-128
+-- -------------------------------------------------------------------------
+-- Los envases modernos usan código DataMatrix (2D) o GS1-128 (lineal apilado)
+-- que codifican múltiples datos con Identificadores de Aplicación (AI):
+--
+--   (01) GTIN              ← 14 dígitos, el que va en esta tabla
+--   (21) Número de serie   ← hasta 20 caracteres alfanuméricos
+--   (10) Número de lote
+--   (17) Fecha de vencimiento (AAMMDD)
+--
+-- Fuente: Disposición ANMAT 2303/2014 y FAQs SNT-PM:
+--   https://www.anmat.gob.ar/trazabilidad_PM/faqs.asp
+--
+-- Al integrar un lector de DataMatrix en OpenEMR, el string crudo puede ser:
+--   "(01)07790001234567(21)AB12345(10)L2024(17)261231"
+-- Se debe extraer SOLO los 14 dígitos que siguen al AI (01) para buscar aquí.
+-- Ejemplo de parseo (PHP):
+--   preg_match('/\(01\)(\d{14})/', $raw, $m); $gtin = $m[1];
+-- Ejemplo SQL para comparar con el EAN-13 del lector lineal (13 dígitos):
+--   WHERE gtin = LPAD(:ean13, 14, '0')
 -- =============================================================================
 
 TRUNCATE TABLE `sct2_map_gtin`;
