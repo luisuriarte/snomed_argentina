@@ -1,0 +1,22 @@
+# Datos y documentos de terceros: este repositorio solo versiona scripts y documentación
+*.sql.gz
+*.dump
+*.bak
+odontologico_bak*
+*.csv
+*.xlsx
+*.xls
+*.pdf
+datos/
+
+# Credenciales
+.env
+*.cnf
+*.pem
+
+# Archivos del sistema y del editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
